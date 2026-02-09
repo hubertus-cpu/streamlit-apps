@@ -1,0 +1,28 @@
+# Virtual Environment
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Environment variables
+.env
+.env.local
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Data files (optional - uncomment if you don't want to track data)
+# *.csv
+# *.xlsx
