@@ -1,0 +1,7 @@
+client_id,tag,region,region1,region2,pod,CA,RM,review_cawb,SG,layer
+1001,G,North,North-East,Zone-A,Pod-1,CA-01,RM-01,2024-03-15,SG-01,L1
+1001,G,North,North-East,Zone-A,Pod-1,CA-01,RM-01,2025-01-10,SG-01,L2
+1002,U,South,South-West,Zone-B,Pod-2,CA-02,RM-02,2023-11-01,SG-02,L1
+1003,P,West,West-Central,Zone-C,Pod-1,CA-03,RM-03,,SG-03,L1
+1004,X,East,East-North,Zone-D,Pod-3,CA-04,RM-04,2025-02-01,SG-04,L1
+1005,G,,East-South,,Pod-2,CA-02,RM-05,2024-08-20,SG-02,L1

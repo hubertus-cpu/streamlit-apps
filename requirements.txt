@@ -1,3 +1,0 @@
-streamlit
-pyodbc
-streamlit-searchbox
