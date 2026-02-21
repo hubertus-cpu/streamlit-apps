@@ -7,6 +7,8 @@ from typing import Optional, Tuple
 
 from utils.helpers import normalize_text, parse_date
 
+MIN_ALLOWED_DATE = date(2022, 1, 1)
+
 
 def validate_optional_date(value: object, field_name: str) -> Tuple[bool, str, str]:
     """Validate optional YYYY-MM-DD dates that must not be in the future."""
@@ -17,6 +19,9 @@ def validate_optional_date(value: object, field_name: str) -> Tuple[bool, str, s
     parsed_value: Optional[date] = parse_date(value)
     if parsed_value is None:
         return False, f"{field_name} must be a valid date (YYYY-MM-DD, YYYY-MM, or YYYY).", ""
+
+    if parsed_value < MIN_ALLOWED_DATE:
+        return False, f"{field_name} cannot be before {MIN_ALLOWED_DATE.isoformat()}.", ""
 
     if parsed_value > date.today():
         return False, f"{field_name} cannot be in the future.", ""

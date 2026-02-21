@@ -10,6 +10,7 @@ import pandas as pd
 from dateutil.relativedelta import relativedelta
 
 from config import ALLOWED_TAGS, AUDIT_COLUMNS, REQUIRED_CLIENT_COLUMNS, USER_INPUT_COLUMNS
+from services import validation_service
 from utils.helpers import atomic_write_dataframe, file_lock, iso_now, parse_date, read_csv_or_empty
 
 STATUS_LABELS = {
@@ -150,6 +151,14 @@ def persist_user_edit(
     new_values: Dict[str, str],
 ) -> Tuple[str, Dict[str, str], Dict[str, str]]:
     """Deactivate prior active row and append a new active user input entry."""
+    valid, error_message, normalized_values = validation_service.validate_edit_payload(
+        new_values.get("review_date", ""),
+        new_values.get("layer_date", ""),
+        new_values.get("comment", ""),
+    )
+    if not valid:
+        raise ValueError(error_message or "Invalid edit payload.")
+
     with file_lock(user_inputs_file):
         user_inputs_df = read_csv_or_empty(user_inputs_file, USER_INPUT_COLUMNS)
         user_inputs_df["is_active"] = user_inputs_df["is_active"].astype(str).str.lower().isin(["true", "1", "yes"])
@@ -178,9 +187,9 @@ def persist_user_edit(
         new_row = {
             "entry_id": entry_id,
             "client_id": str(client_id),
-            "review_date": new_values.get("review_date", ""),
-            "layer_date": new_values.get("layer_date", ""),
-            "comment": new_values.get("comment", ""),
+            "review_date": normalized_values.get("review_date", ""),
+            "layer_date": normalized_values.get("layer_date", ""),
+            "comment": normalized_values.get("comment", ""),
             "changed_by": changed_by,
             "change_timestamp": timestamp,
             "is_active": True,
@@ -190,4 +199,4 @@ def persist_user_edit(
         updated_df = pd.concat([user_inputs_df, pd.DataFrame([new_row])], ignore_index=True)
         atomic_write_dataframe(updated_df[USER_INPUT_COLUMNS], user_inputs_file)
 
-    return entry_id, old_values, new_values
+    return entry_id, old_values, normalized_values
