@@ -35,6 +35,15 @@ def render_bulk_edit_panel(selected_count: int) -> Tuple[bool, Dict[str, str]]:
         label_visibility="collapsed",
     )
     st.markdown(
+        '<div class="bulk-field-label">Bulk Test Date (YYYY-MM-DD)</div>',
+        unsafe_allow_html=True,
+    )
+    test_date = st.text_input(
+        "Bulk Test Date (YYYY-MM-DD)",
+        key="bulk_test_date",
+        label_visibility="collapsed",
+    )
+    st.markdown(
         '<div class="bulk-field-label">Bulk Comment</div>',
         unsafe_allow_html=True,
     )
@@ -49,6 +58,7 @@ def render_bulk_edit_panel(selected_count: int) -> Tuple[bool, Dict[str, str]]:
     payload = {
         "review_date": review_date,
         "layer_date": layer_date,
+        "test_date": test_date,
         "comment": comment,
     }
     return apply_clicked, payload

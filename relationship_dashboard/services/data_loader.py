@@ -95,18 +95,22 @@ def load_user_inputs(user_inputs_file: Path) -> pd.DataFrame:
 def get_active_user_inputs(user_inputs_df: pd.DataFrame) -> pd.DataFrame:
     """Return one active entry per client, preferring the latest timestamp."""
     if user_inputs_df.empty:
-        return pd.DataFrame(columns=["client_id", "entry_id", "review_date", "layer_date", "comment"])
+        return pd.DataFrame(
+            columns=["client_id", "entry_id", "review_date", "layer_date", "test_date", "comment"]
+        )
 
     active_df = user_inputs_df[user_inputs_df["is_active"]].copy()
     if active_df.empty:
-        return pd.DataFrame(columns=["client_id", "entry_id", "review_date", "layer_date", "comment"])
+        return pd.DataFrame(
+            columns=["client_id", "entry_id", "review_date", "layer_date", "test_date", "comment"]
+        )
 
     active_df = (
         active_df.sort_values(["client_id", "change_timestamp"])  # ISO timestamps sort lexicographically.
         .groupby("client_id", as_index=False)
         .tail(1)
     )
-    return active_df[["client_id", "entry_id", "review_date", "layer_date", "comment"]]
+    return active_df[["client_id", "entry_id", "review_date", "layer_date", "test_date", "comment"]]
 
 
 def _compute_status(review_date: str) -> str:
@@ -132,7 +136,7 @@ def merge_clients_with_user_inputs(clients_df: pd.DataFrame, active_inputs_df: p
     merged_df = clients_df.merge(active_inputs_df, on="client_id", how="left")
     merged_df = merged_df.rename(columns={"entry_id": "active_entry_id"})
 
-    for column in ["review_date", "layer_date", "comment", "active_entry_id"]:
+    for column in ["review_date", "layer_date", "test_date", "comment", "active_entry_id"]:
         merged_df[column] = merged_df[column].fillna("")
 
     merged_df["status"] = merged_df.apply(
@@ -154,6 +158,7 @@ def persist_user_edit(
     valid, error_message, normalized_values = validation_service.validate_edit_payload(
         new_values.get("review_date", ""),
         new_values.get("layer_date", ""),
+        new_values.get("test_date", ""),
         new_values.get("comment", ""),
     )
     if not valid:
@@ -166,7 +171,7 @@ def persist_user_edit(
         client_mask = user_inputs_df["client_id"] == str(client_id)
         active_mask = client_mask & user_inputs_df["is_active"]
 
-        old_values = {"review_date": "", "layer_date": "", "comment": ""}
+        old_values = {"review_date": "", "layer_date": "", "test_date": "", "comment": ""}
         previous_entry_id = ""
 
         if active_mask.any():
@@ -177,6 +182,7 @@ def persist_user_edit(
             old_values = {
                 "review_date": str(previous_active.get("review_date", "")),
                 "layer_date": str(previous_active.get("layer_date", "")),
+                "test_date": str(previous_active.get("test_date", "")),
                 "comment": str(previous_active.get("comment", "")),
             }
 
@@ -189,6 +195,7 @@ def persist_user_edit(
             "client_id": str(client_id),
             "review_date": normalized_values.get("review_date", ""),
             "layer_date": normalized_values.get("layer_date", ""),
+            "test_date": normalized_values.get("test_date", ""),
             "comment": normalized_values.get("comment", ""),
             "changed_by": changed_by,
             "change_timestamp": timestamp,

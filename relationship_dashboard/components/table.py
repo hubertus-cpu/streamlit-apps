@@ -68,6 +68,8 @@ def render_table(page_df: pd.DataFrame, selected_client_ids: Set[str]) -> Tuple[
     for column in ("review_date", "layer_date"):
         if column in original_df.columns:
             original_df[column] = original_df[column].apply(_normalize_date_value)
+    if "test_date" in original_df.columns:
+        original_df["test_date"] = original_df["test_date"].apply(normalize_text)
 
     working_df = original_df.copy()
     working_df["selected"] = working_df["client_id"].isin(selected_client_ids)
@@ -90,7 +92,7 @@ def render_table(page_df: pd.DataFrame, selected_client_ids: Set[str]) -> Tuple[
         unsafe_allow_html=True,
     )
 
-    editable_columns = ["selected", "review_date", "layer_date", "comment"]
+    editable_columns = ["selected", "review_date", "layer_date", "test_date", "comment"]
     disabled_columns = [column for column in display_columns if column not in editable_columns]
 
     edited_df = st.data_editor(
@@ -112,6 +114,10 @@ def render_table(page_df: pd.DataFrame, selected_client_ids: Set[str]) -> Tuple[
                 "layer_date",
                 format="YYYY-MM-DD",
                 step=1,
+            ),
+            "test_date": st.column_config.TextColumn(
+                "test_date",
+                help="Enter date as YYYY-MM-DD",
             ),
             "comment": st.column_config.TextColumn("comment"),
         },
@@ -140,11 +146,13 @@ def render_table(page_df: pd.DataFrame, selected_client_ids: Set[str]) -> Tuple[
         old_values = {
             "review_date": _normalize_date_value(original_row.get("review_date", "")),
             "layer_date": _normalize_date_value(original_row.get("layer_date", "")),
+            "test_date": normalize_text(original_row.get("test_date", "")),
             "comment": normalize_text(original_row.get("comment", "")),
         }
         new_values = {
             "review_date": _normalize_date_value(row.get("review_date", "")),
             "layer_date": _normalize_date_value(row.get("layer_date", "")),
+            "test_date": normalize_text(row.get("test_date", "")),
             "comment": normalize_text(row.get("comment", "")),
         }
 

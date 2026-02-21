@@ -140,6 +140,7 @@ def process_inline_edits(edit_requests: List[dict]) -> Tuple[bool, bool]:
         valid, error_message, normalized_values = validation_service.validate_edit_payload(
             request["new_values"].get("review_date", ""),
             request["new_values"].get("layer_date", ""),
+            request["new_values"].get("test_date", ""),
             request["new_values"].get("comment", ""),
         )
         if not valid:
@@ -181,6 +182,7 @@ def process_bulk_edit(selected_client_ids: set[str], payload: dict, current_data
     valid, error_message, normalized_values = validation_service.validate_edit_payload(
         payload.get("review_date", ""),
         payload.get("layer_date", ""),
+        payload.get("test_date", ""),
         payload.get("comment", ""),
     )
     if not valid:

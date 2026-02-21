@@ -38,6 +38,7 @@ USER_INPUT_COLUMNS = [
     "client_id",
     "review_date",
     "layer_date",
+    "test_date",
     "comment",
     "changed_by",
     "change_timestamp",
@@ -57,7 +58,7 @@ AUDIT_COLUMNS = [
 
 FILTER_COLUMNS = ["region", "region1", "region2", "pod", "CA", "RM", "SG", "status"]
 
-EDITABLE_COLUMNS = ["review_date", "layer_date", "comment"]
+EDITABLE_COLUMNS = ["review_date", "layer_date", "test_date", "comment"]
 
 TABLE_COLUMNS = [
     "selected",
@@ -74,5 +75,6 @@ TABLE_COLUMNS = [
     "review_cawb",
     "review_date",
     "layer_date",
+    "test_date",
     "comment",
 ]
